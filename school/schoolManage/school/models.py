@@ -3,7 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.contrib.auth.models import BaseUserManager
 
-
 class SoftDeleteModel(models.Model):
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
@@ -110,4 +109,3 @@ class Marks(SoftDeleteModel):
 
     def __str__(self):
         return f"{self.fk_user} - {self.mark} in {self.fk_subject} for {self.fk_exam}"
-

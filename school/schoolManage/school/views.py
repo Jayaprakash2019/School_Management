@@ -1,43 +1,89 @@
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAdminUser  # Restrict access to admin users
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import get_user_model
-from .serializers import UserSerializer,ClassSerializer,AttendanceSerializer,SubjectSerializer,ExamSerializer,MarksSerializer
+from .serializers import UserRegistrationSerializer,UserLoginSerializer,ClassSerializer,AttendanceSerializer,SubjectSerializer,ExamSerializer,MarksSerializer
 from django.shortcuts import get_object_or_404
 from .models import Class,Attendance,Subject
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
+
 
 User = get_user_model()
-class UserList(APIView):
-    def get(self, request):
-        users = User.objects.all()  # Non-deleted users
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
+
+# class UserList(APIView):
+#     def get(self, request):
+#         users = User.objects.all()  # Non-deleted users
+#         serializer = UserSerializer(users, many=True)
+#         return Response(serializer.data)
+
+#     def post(self, request):
+#         serializer = UserSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# class UserDetail(APIView):
+#     def get(self, request, id):
+#         user = get_object_or_404(User.objects_with_deleted, pk=id)  # Include soft-deleted users
+#         serializer = UserSerializer(user)
+#         return Response(serializer.data)
+
+#     def put(self, request, id):
+#         user = get_object_or_404(User.objects_with_deleted, pk=id)
+#         serializer = UserSerializer(user, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     def delete(self, request, id):
+#         user = get_object_or_404(User.objects_with_deleted, pk=id)
+#         user.delete()  # Soft delete
+#         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+#userRegistration
+class UserRegistrationView(APIView):
+    permission_classes = [IsAdminUser]  # Only admin users can access this view
+
+    # permission_classes = [AllowAny]  # Allow any user to register
 
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"message": "User registered successfully."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class UserDetail(APIView):
-    def get(self, request, id):
-        user = get_object_or_404(User.objects_with_deleted, pk=id)  # Include soft-deleted users
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
+class UserLoginView(APIView):
+    permission_classes = [AllowAny]
 
-    def put(self, request, id):
-        user = get_object_or_404(User.objects_with_deleted, pk=id)
-        serializer = UserSerializer(user, data=request.data)
+    def post(self, request):
+        serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            email = serializer.data.get('email')
+            password = serializer.data.get('password')
+            
+            # breakpoint()
 
-    def delete(self, request, id):
-        user = get_object_or_404(User.objects_with_deleted, pk=id)
-        user.delete()  # Soft delete
-        return Response(status=status.HTTP_204_NO_CONTENT)
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return Response({"detail": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
+
+            if user.check_password(password):
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                })
+            else:
+                return Response({"detail": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #classes
 class ClassList(APIView):

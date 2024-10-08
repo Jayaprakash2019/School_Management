@@ -1,18 +1,28 @@
 from django.urls import path
-from .views import UserList, UserDetail, ClassList, ClassDetail,AttendanceList, AttendanceDetail, SubjectList, SubjectDetail, ExamList, ExamDetail, MarksList, MarksDetail  
+from .views import   ClassList, ClassDetail,AttendanceList, AttendanceDetail, SubjectList, SubjectDetail, ExamList, ExamDetail, MarksList, MarksDetail  
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
 
-urlpatterns = [
-    #user
-    path('api/users', UserList.as_view(), name='user-list'),
-    path('api/users/<int:id>/', UserDetail.as_view(), name='user-detail'),
+from .views import UserRegistrationView, UserLoginView
+from rest_framework_simplejwt.views import TokenRefreshView
 
-    #jwt token
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+urlpatterns = [
+    
+    #register and login
+    path('register/', UserRegistrationView.as_view(), name='register'),
+    path('login/', UserLoginView.as_view(), name='login'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
+    # #user
+    # path('api/users', UserList.as_view(), name='user-list'),
+    # path('api/users/<int:id>/', UserDetail.as_view(), name='user-detail'),
+
+    # #jwt token
+    # path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     #class
     path('api/classes', ClassList.as_view(), name='class-list'),
