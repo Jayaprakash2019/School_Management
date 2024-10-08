@@ -3,6 +3,44 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.contrib.auth.models import BaseUserManager
 
+# class SoftDeleteModel(models.Model):
+#     is_deleted = models.BooleanField(default=False)
+#     deleted_at = models.DateTimeField(null=True, blank=True)
+
+#     def delete(self, *args, **kwargs):
+#         self.is_deleted = True
+#         self.deleted_at = timezone.now()
+#         self.save()
+
+#     def hard_delete(self, *args, **kwargs):
+#         """ Completely deletes the object from the database """
+#         super(SoftDeleteModel, self).delete(*args, **kwargs)
+
+#     class Meta:
+#         abstract = True
+
+# class SoftDeleteManager(BaseUserManager):
+#     def get_queryset(self):
+#         return super().get_queryset().filter(is_deleted=False)
+
+# # Custom User model
+# class User(AbstractUser, SoftDeleteModel):
+#     ROLE_CHOICES = [
+#         ('student', 'Student'),
+#         ('teacher', 'Teacher'),
+#         ('admin', 'Admin'),
+#     ]
+    
+#     # Custom fields
+#     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+#     email = models.EmailField(unique=True)
+
+#     objects = SoftDeleteManager()  # Use the soft delete manager
+    
+#     def __str__(self):
+#         return self.username
+
+
 class SoftDeleteModel(models.Model):
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
@@ -21,7 +59,13 @@ class SoftDeleteModel(models.Model):
 
 class SoftDeleteManager(BaseUserManager):
     def get_queryset(self):
+        # Only return users that are not soft-deleted
         return super().get_queryset().filter(is_deleted=False)
+
+class AllUsersManager(BaseUserManager):
+    def get_queryset(self):
+        # Return all users, including soft-deleted
+        return super().get_queryset()
 
 # Custom User model
 class User(AbstractUser, SoftDeleteModel):
@@ -35,11 +79,12 @@ class User(AbstractUser, SoftDeleteModel):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
     email = models.EmailField(unique=True)
 
-    objects = SoftDeleteManager()  # Use the soft delete manager
+    objects = SoftDeleteManager()  # Only active users
+    objects_with_deleted = AllUsersManager()  # All users, including soft-deleted
     
     def __str__(self):
         return self.username
-    
+
 #class
 class Class(SoftDeleteModel):
     class_name = models.CharField(max_length=255)
