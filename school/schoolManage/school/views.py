@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from .models import Class,Attendance,Subject
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-
+import os
 
 User = get_user_model()
 
@@ -52,7 +52,7 @@ class UserDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-#userRegistration
+# #userRegistration
 class UserRegistrationView(APIView):
     permission_classes = [IsAdminUser]  # Only admin users can access this view
 
@@ -64,7 +64,6 @@ class UserRegistrationView(APIView):
             serializer.save()
             return Response({"message": "User registered successfully."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class UserLoginView(APIView):
