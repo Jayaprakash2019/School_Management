@@ -6,7 +6,7 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from .serializers import UserSerializer,UserRegistrationSerializer,UserLoginSerializer,ClassSerializer,AttendanceSerializer,SubjectSerializer,ExamSerializer,MarksSerializer
 from django.shortcuts import get_object_or_404
-from .models import Class,Attendance,Subject
+from .models import Class,Attendance,Subject,Exam,Marks
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .permissions import IsAuthenticatedAndRole, IsAdmin, IsTeacher, IsStudent, IsAdminOrTeacher, IsAdminOrTeacherOrStudent
