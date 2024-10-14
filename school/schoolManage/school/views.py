@@ -85,9 +85,13 @@ class UserLoginView(APIView):
 
             if user.check_password(password):
                 refresh = RefreshToken.for_user(user)
+
+                #get role
+                role = getattr(user, 'role')
                 return Response({
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
+                    'role': role  # Include the user's role in the response
                 })
             else:
                 return Response({"detail": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)

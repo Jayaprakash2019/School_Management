@@ -183,3 +183,4 @@ class Marks(SoftDeleteModel):
 
     def __str__(self):
         return f"{self.fk_user} - {self.mark} in {self.fk_subject} for {self.fk_exam}"
+    
