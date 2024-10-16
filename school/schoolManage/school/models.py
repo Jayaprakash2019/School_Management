@@ -120,6 +120,8 @@ class Class(SoftDeleteModel):
     fk_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='classes')
 
     objects = SoftDeleteManager()
+    objects_with_deleted = AllUsersManager()  
+
 
     def __str__(self):
         return self.class_name
@@ -130,6 +132,7 @@ class ClassMember(SoftDeleteModel):
     fk_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='class_memberships')
 
     objects = SoftDeleteManager()
+    objects_with_deleted = AllUsersManager()  
 
     def __str__(self):
         return f"{self.fk_user} in {self.fk_class}"
@@ -147,6 +150,8 @@ class Attendance(SoftDeleteModel):
     date = models.DateField()
 
     objects = SoftDeleteManager()
+    objects_with_deleted = AllUsersManager()  
+
 
     def __str__(self):
         return f"{self.fk_user} - {self.status} on {self.date}"
@@ -154,9 +159,12 @@ class Attendance(SoftDeleteModel):
 # Subject model
 class Subject(SoftDeleteModel):
     subject_name = models.CharField(max_length=255)
-    fk_user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    fk_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='studying_student', default=1)  # Unique related_name for creator
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='taught_subjects', default=1)  # Unique related_name for teacher
 
     objects = SoftDeleteManager()
+    objects_with_deleted = AllUsersManager()  
+
 
     def __str__(self):
         return self.subject_name
@@ -168,6 +176,8 @@ class Exam(SoftDeleteModel):
     date = models.DateField()
 
     objects = SoftDeleteManager()
+    objects_with_deleted = AllUsersManager()  
+
 
     def __str__(self):
         return self.exam_name
@@ -180,6 +190,8 @@ class Marks(SoftDeleteModel):
     mark = models.FloatField()
 
     objects = SoftDeleteManager()
+    objects_with_deleted = AllUsersManager()  
+
 
     def __str__(self):
         return f"{self.fk_user} - {self.mark} in {self.fk_subject} for {self.fk_exam}"

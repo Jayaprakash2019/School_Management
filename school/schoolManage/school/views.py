@@ -88,10 +88,12 @@ class UserLoginView(APIView):
 
                 #get role
                 role = getattr(user, 'role')
+                userName = getattr(user,'username')
                 return Response({
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
-                    'role': role  # Include the user's role in the response
+                    'role': role , # Include the user's role in the response
+                    'username': userName
                 })
             else:
                 return Response({"detail": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
@@ -199,6 +201,7 @@ class SubjectList(APIView):
 
 
 class SubjectDetail(APIView):
+
     @permission_classes([IsAdminOrTeacherOrStudent])
     def get(self, request, id):
         subject = get_object_or_404(Subject.objects_with_deleted, pk=id)  # Include soft-deleted subjects

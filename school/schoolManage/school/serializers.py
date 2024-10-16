@@ -37,8 +37,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
-    
-    
+    # person = UserSerializer(read_only=True)
+
     def validate_email(self, value):
         if not User.objects.filter(email=value).exists():
             raise serializers.ValidationError("This email is not registered.")
@@ -63,9 +63,10 @@ class AttendanceSerializer(serializers.ModelSerializer):
 
 #subject
 class SubjectSerializer(serializers.ModelSerializer):
+    teacher = UserSerializer(read_only=True)
     class Meta:
         model = Subject
-        fields = '__all__'
+        fields = ['id', 'subject_name', 'teacher']  # Add any other fields as needed
 
 #Exam
 class ExamSerializer(serializers.ModelSerializer):
