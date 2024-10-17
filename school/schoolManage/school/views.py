@@ -161,6 +161,7 @@ class AttendanceList(APIView):
 
 class AttendanceDetail(APIView):
     
+
     @permission_classes([IsAdminOrTeacher])
     def get(self, request, id):
         attendance = get_object_or_404(Attendance.objects_with_deleted, pk=id)  # Include soft-deleted records
@@ -181,6 +182,16 @@ class AttendanceDetail(APIView):
         attendance = get_object_or_404(Attendance.objects_with_deleted, pk=id)
         attendance.delete()  # Soft delete
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class UserAttendanceList(APIView):
+    permission_classes = [IsAdminOrTeacherOrStudent]
+
+    def get(self, request):
+        user = request.user
+        # Filter attendance records for the authenticated user
+        attendance = Attendance.objects.filter(fk_user=user)
+        serializer = AttendanceSerializer(attendance, many=True)
+        return Response(serializer.data)
 
 #subject
 class SubjectList(APIView):
@@ -304,4 +315,3 @@ class MarksDetail(APIView):
         marks = get_object_or_404(Marks.objects_with_deleted, pk=id)
         marks.delete()  # Soft delete
         return Response(status=status.HTTP_204_NO_CONTENT)
-
