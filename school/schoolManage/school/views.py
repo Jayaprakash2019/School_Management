@@ -234,6 +234,17 @@ class SubjectDetail(APIView):
         subject.delete()  # Soft delete
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class UserSubjectList(APIView):
+    permission_classes = [IsAdminOrTeacherOrStudent]
+
+    def get(self, request):
+        user = request.user
+        # Filter attendance records for the authenticated user
+        subject = Subject.objects.filter(fk_user=user)
+        serializer = SubjectSerializer(subject,many=True)
+        return Response(serializer.data)
+
+
 #Exam
 class ExamList(APIView):
     
