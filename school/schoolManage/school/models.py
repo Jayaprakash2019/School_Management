@@ -171,9 +171,17 @@ class Subject(SoftDeleteModel):
 
 # Exam model
 class Exam(SoftDeleteModel):
-    exam_name = models.CharField(max_length=255)
+    EXAM_CHOICES = [
+        ('first_term', 'first_term'),
+        ('quaterly', 'quaterly'),
+        ('second_term', 'second_term'),
+        ('half_yearly', 'half_yearly'),
+        ('third_term', 'third_term'),
+        ('finals', 'finals'),
+    ]
+
+    exam_name = models.CharField(max_length=20, choices=EXAM_CHOICES)
     fk_user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-    date = models.DateField()
 
     objects = SoftDeleteManager()
     objects_with_deleted = AllUsersManager()  
@@ -188,6 +196,7 @@ class Marks(SoftDeleteModel):
     fk_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='marks')
     fk_exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name='marks')
     mark = models.FloatField()
+    Exam_date = models.DateField(null=True, blank=True)
 
     objects = SoftDeleteManager()
     objects_with_deleted = AllUsersManager()  
